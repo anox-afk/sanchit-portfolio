@@ -1,6 +1,7 @@
 # Raw source media (large files - not needed in repo)
 Sanchit/
 *.zip
+*.mp4
 
 # Logs
 logs
@@ -26,3 +27,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+.vercel

@@ -1,82 +1,56 @@
-import React, { useRef } from 'react';
+import React from 'react';
 
-import annuraFashion from '../assets/annura_fashion.mp4';
-import productShoot from '../assets/product_shoot.mp4';
-import traditionalShoot from '../assets/traditional_shoot.mp4';
-import storeShoot from '../assets/store_shoot.mp4';
-import sdCampus from '../assets/sd_campus.mp4';
-import video487 from '../assets/video_487.mp4';
+import thumbFashion from '../assets/thumb_fashion.png';
+import thumbProduct from '../assets/thumb_product.png';
+import thumbTraditional from '../assets/thumb_traditional.png';
+import thumbStore from '../assets/thumb_store.png';
+import thumbCampus from '../assets/thumb_campus.png';
+import thumbCreative from '../assets/thumb_creative.png';
 
 const projects = [
   {
-    src: annuraFashion,
+    thumb: thumbFashion,
     tag: 'Fashion',
     title: 'Annura Fashion',
     description: 'A stunning fashion film with dynamic transitions and cinematic color grading.'
   },
   {
-    src: productShoot,
+    thumb: thumbProduct,
     tag: 'Product',
     title: 'Product Shoot',
     description: 'High-end product videography with controlled lighting and crisp composition.'
   },
   {
-    src: traditionalShoot,
+    thumb: thumbTraditional,
     tag: 'Cultural',
     title: 'Traditional Shoot',
     description: 'Capturing cultural essence with vibrant visuals and authentic storytelling.'
   },
   {
-    src: storeShoot,
+    thumb: thumbStore,
     tag: 'Commercial',
     title: 'Store Shoot',
     description: 'Brand-forward commercial shoot for a retail store environment.'
   },
   {
-    src: sdCampus,
+    thumb: thumbCampus,
     tag: 'Campus',
     title: 'SD Campus',
     description: 'Energetic campus videography featuring student life and campus culture.'
   },
   {
-    src: video487,
+    thumb: thumbCreative,
     tag: 'Creative',
     title: 'Creative Reel',
     description: 'Experimental creative reel showcasing editing skills and motion design.'
   },
 ];
 
-const VideoCard = ({ project }) => {
-  const videoRef = useRef(null);
-
-  const handleMouseEnter = () => {
-    if (videoRef.current) {
-      videoRef.current.play();
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
-  };
-
+const ProjectCard = ({ project }) => {
   return (
-    <div
-      className="project-card"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <div className="project-card">
       <div className="project-video-wrap">
-        <video
-          ref={videoRef}
-          src={project.src}
-          muted
-          loop
-          playsInline
-          preload="metadata"
-        />
+        <img src={project.thumb} alt={project.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} />
         <div className="project-play-overlay">
           <div className="play-btn">▶</div>
         </div>
@@ -97,12 +71,12 @@ const Projects = () => {
         <p className="section-label">Portfolio</p>
         <h2 className="section-title">Featured Work</h2>
         <p className="section-desc">
-          Hover over any project to preview — a glimpse of the stories behind the lens.
+          A glimpse of the stories behind the lens — from fashion to broadcast.
         </p>
 
         <div className="projects-grid">
           {projects.map((project, i) => (
-            <VideoCard key={i} project={project} />
+            <ProjectCard key={i} project={project} />
           ))}
         </div>
       </div>
