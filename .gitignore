@@ -1,5 +1,6 @@
 # Raw source media (large files - not needed in repo)
 Sanchit/
+*.zip
 
 # Logs
 logs
