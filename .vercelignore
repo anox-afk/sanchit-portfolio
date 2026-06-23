@@ -1,0 +1,6 @@
+node_modules
+Sanchit/
+*.mp4
+*.zip
+src/assets/*.mp4
+.git
