@@ -1,35 +1,42 @@
 import React, { useRef, useEffect } from 'react';
-import sanchitBase from '../assets/sanchit_base.jpg';
-import sanchitSpider from '../assets/sanchit_spiderman_face.png';
+import sanchitBase from '../assets/sanchit_base.png';
+import sanchitSpider from '../assets/sanchit_spider_overlay.png';
+
+const RADIUS = 140; // reveal circle radius in px
 
 const Hero = () => {
   const containerRef = useRef(null);
   const overlayRef = useRef(null);
-  const cursorRef = useRef(null);
+  const cursorDotRef = useRef(null);
+  const cursorRingRef = useRef(null);
   const rafRef = useRef(null);
-
-  // lerp values
-  const cur = useRef({ x: 0, y: 0 });
-  const target = useRef({ x: 0, y: 0 });
-  const RADIUS = 130;
+  const cur = useRef({ x: -9999, y: -9999 });
+  const target = useRef({ x: -9999, y: -9999 });
+  const isInside = useRef(false);
 
   useEffect(() => {
     const container = containerRef.current;
     const overlay = overlayRef.current;
-    const cursor = cursorRef.current;
-    let active = false;
+    const dot = cursorDotRef.current;
+    const ring = cursorRingRef.current;
 
     const lerp = (a, b, t) => a + (b - a) * t;
 
     const tick = () => {
-      cur.current.x = lerp(cur.current.x, target.current.x, 0.1);
-      cur.current.y = lerp(cur.current.y, target.current.y, 0.1);
+      cur.current.x = lerp(cur.current.x, target.current.x, 0.12);
+      cur.current.y = lerp(cur.current.y, target.current.y, 0.12);
+      const { x, y } = cur.current;
 
-      const x = cur.current.x;
-      const y = cur.current.y;
+      if (isInside.current) {
+        overlay.style.clipPath = `circle(${RADIUS}px at ${x}px ${y}px)`;
+      } else {
+        overlay.style.clipPath = `circle(0px at ${x}px ${y}px)`;
+      }
 
-      overlay.style.clipPath = `circle(${active ? RADIUS : 0}px at ${x}px ${y}px)`;
-      cursor.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+      dot.style.left = `${x}px`;
+      dot.style.top = `${y}px`;
+      ring.style.left = `${x}px`;
+      ring.style.top = `${y}px`;
 
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -40,15 +47,15 @@ const Hero = () => {
       const rect = container.getBoundingClientRect();
       target.current.x = e.clientX - rect.left;
       target.current.y = e.clientY - rect.top;
-      if (!active) {
-        active = true;
-        cursor.style.opacity = '1';
-      }
+      isInside.current = true;
+      dot.style.opacity = '1';
+      ring.style.opacity = '1';
     };
 
     const onLeave = () => {
-      active = false;
-      cursor.style.opacity = '0';
+      isInside.current = false;
+      dot.style.opacity = '0';
+      ring.style.opacity = '0';
     };
 
     container.addEventListener('mousemove', onMove);
@@ -73,186 +80,196 @@ const Hero = () => {
         background: '#09090b',
       }}
     >
-      {/* ── BASE LAYER: Normal photo ── */}
+      {/* ─── BASE IMAGE: Clean dark portrait, no mask ─── */}
       <img
         src={sanchitBase}
         alt="Sanchit Kumar"
+        draggable={false}
         style={{
           position: 'absolute',
           inset: 0,
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          objectPosition: 'center top',
-          filter: 'brightness(0.55) contrast(1.1) saturate(0.8)',
+          // Portrait image: face is in upper-center — shift so face centers on landscape screen
+          objectPosition: 'center 10%',
           userSelect: 'none',
           pointerEvents: 'none',
         }}
       />
 
-      {/* ── Dark gradient overlay for text readability ── */}
+      {/* ─── Left dark vignette for text readability ─── */}
       <div style={{
         position: 'absolute',
         inset: 0,
-        background: 'linear-gradient(to right, rgba(9,9,11,0.7) 0%, rgba(9,9,11,0.1) 50%, transparent 100%)',
+        background: 'linear-gradient(100deg, rgba(9,9,11,0.75) 0%, rgba(9,9,11,0.2) 45%, transparent 70%)',
         pointerEvents: 'none',
         zIndex: 1,
       }} />
+      {/* Bottom vignette */}
       <div style={{
         position: 'absolute',
         inset: 0,
-        background: 'linear-gradient(to top, rgba(9,9,11,0.8) 0%, transparent 50%)',
+        background: 'linear-gradient(to top, rgba(9,9,11,0.85) 0%, transparent 40%)',
         pointerEvents: 'none',
         zIndex: 1,
       }} />
 
-      {/* ── OVERLAY LAYER: Spiderman masked photo, revealed by circle ── */}
+      {/* ─── OVERLAY IMAGE: Same frame but with Spiderman mask ─── */}
       <img
         ref={overlayRef}
         src={sanchitSpider}
-        alt="Spiderman"
+        alt=""
+        aria-hidden="true"
+        draggable={false}
         style={{
           position: 'absolute',
           inset: 0,
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          objectPosition: 'center top',
-          filter: 'brightness(0.75) contrast(1.1)',
+          objectPosition: 'center 10%',
           clipPath: 'circle(0px at 50% 50%)',
-          transition: 'none',
           userSelect: 'none',
           pointerEvents: 'none',
           zIndex: 2,
         }}
       />
 
-      {/* ── Custom cursor: spider icon ── */}
+      {/* ─── Custom cursor: ring ─── */}
       <div
-        ref={cursorRef}
+        ref={cursorRingRef}
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          zIndex: 10,
-          opacity: 0,
-          pointerEvents: 'none',
-          transition: 'opacity 0.3s',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '4px',
-        }}
-      >
-        {/* Circle ring */}
-        <div style={{
           position: 'absolute',
           width: `${RADIUS * 2}px`,
           height: `${RADIUS * 2}px`,
-          border: '1.5px solid rgba(232,0,28,0.5)',
           borderRadius: '50%',
+          border: '1.5px solid rgba(232, 0, 28, 0.6)',
           transform: 'translate(-50%, -50%)',
           pointerEvents: 'none',
-        }} />
-        {/* Spider icon */}
-        <span style={{
-          fontSize: '1rem',
-          filter: 'drop-shadow(0 0 6px #e8001c)',
-          position: 'absolute',
-          transform: 'translate(-50%, -50%)',
-        }}>🕷</span>
-      </div>
+          zIndex: 10,
+          opacity: 0,
+          transition: 'opacity 0.3s',
+          top: 0,
+          left: 0,
+        }}
+      />
 
-      {/* ── TEXT OVERLAY ── */}
+      {/* ─── Custom cursor: spider dot ─── */}
+      <div
+        ref={cursorDotRef}
+        style={{
+          position: 'absolute',
+          width: '24px',
+          height: '24px',
+          borderRadius: '50%',
+          background: 'rgba(232,0,28,0.15)',
+          border: '1px solid rgba(232,0,28,0.8)',
+          transform: 'translate(-50%, -50%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          pointerEvents: 'none',
+          zIndex: 11,
+          opacity: 0,
+          transition: 'opacity 0.3s',
+          top: 0,
+          left: 0,
+          fontSize: '11px',
+        }}
+      >🕷</div>
+
+      {/* ─── TEXT: bottom-left overlay ─── */}
       <div style={{
         position: 'absolute',
         bottom: '8%',
-        left: '4%',
+        left: '5%',
         zIndex: 5,
         pointerEvents: 'none',
-        userSelect: 'none',
       }}>
-        {/* Small overline */}
         <p style={{
           fontFamily: "'Space Grotesk', sans-serif",
-          fontSize: '0.62rem',
+          fontSize: '0.6rem',
           letterSpacing: '0.3em',
           textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.5)',
-          marginBottom: '0.3rem',
-        }}>Your Friendly Neighborhood</p>
+          color: 'rgba(255,255,255,0.45)',
+          marginBottom: '0.25rem',
+        }}>
+          Your Friendly Neighborhood
+        </p>
         <p style={{
           fontFamily: "'Space Grotesk', sans-serif",
-          fontSize: '0.62rem',
+          fontSize: '0.6rem',
           letterSpacing: '0.3em',
           textTransform: 'uppercase',
           color: '#e8001c',
           marginBottom: '1rem',
-        }}>Videographer &amp; Content Creator</p>
+        }}>
+          Videographer &amp; Content Creator
+        </p>
 
-        {/* Big name */}
         <h1 style={{
           fontFamily: "'Space Grotesk', sans-serif",
           fontWeight: 700,
-          lineHeight: 0.9,
+          lineHeight: 0.88,
           letterSpacing: '-3px',
           textTransform: 'uppercase',
           margin: 0,
         }}>
           <span style={{
             display: 'block',
-            fontSize: 'clamp(3.5rem, 9vw, 9rem)',
+            fontSize: 'clamp(3.5rem, 9.5vw, 9.5rem)',
             color: '#f0f0f0',
           }}>SANCHIT</span>
           <span style={{
             display: 'block',
-            fontSize: 'clamp(3.5rem, 9vw, 9rem)',
+            fontSize: 'clamp(3.5rem, 9.5vw, 9.5rem)',
             color: '#e8001c',
           }}>KUMAR.</span>
         </h1>
       </div>
 
-      {/* ── Download CV link ── */}
+      {/* ─── Download / Explore ─── */}
       <a
-        href="#contact"
+        href="#work"
         style={{
           position: 'absolute',
-          bottom: '3%',
-          left: '4%',
+          bottom: '3.5%',
+          left: '5%',
           zIndex: 5,
           fontFamily: "'Space Grotesk', sans-serif",
-          fontSize: '0.65rem',
-          letterSpacing: '0.2em',
+          fontSize: '0.6rem',
+          letterSpacing: '0.25em',
           textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.4)',
+          color: 'rgba(255,255,255,0.35)',
+          textDecoration: 'none',
           display: 'flex',
           alignItems: 'center',
           gap: '0.5rem',
-          textDecoration: 'none',
-          cursor: 'default',
           transition: 'color 0.3s',
         }}
         onMouseEnter={e => e.currentTarget.style.color = '#e8001c'}
-        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.4)'}
+        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.35)'}
       >
         ↓ Explore Work
       </a>
 
-      {/* ── Scroll hint bottom right ── */}
-      <div style={{
+      {/* ─── Scroll hint bottom-right ─── */}
+      <p style={{
         position: 'absolute',
-        bottom: '3%',
+        bottom: '3.5%',
         right: '3%',
         zIndex: 5,
         fontFamily: "'Space Grotesk', sans-serif",
-        fontSize: '0.6rem',
-        letterSpacing: '0.2em',
+        fontSize: '0.55rem',
+        letterSpacing: '0.25em',
         textTransform: 'uppercase',
-        color: 'rgba(255,255,255,0.3)',
+        color: 'rgba(255,255,255,0.25)',
         pointerEvents: 'none',
+        margin: 0,
       }}>
         Scroll ↓
-      </div>
+      </p>
     </section>
   );
 };
