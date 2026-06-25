@@ -1,49 +1,51 @@
 import React from 'react';
 
+const jobs = [
+  {
+    date: 'Apr 2026 – Present',
+    title: 'Executive – Digital Marketing',
+    company: 'Rama Hospital & Research Centre · Noida, UP',
+    points: [
+      'Spearhead digital marketing strategy across social and paid media channels.',
+      'Create and oversee all content production — video, photography, and copy.',
+      'Manage Meta Ads campaigns with a consistent focus on CTR and engagement growth.',
+      'Collaborate with the brand team to maintain a consistent visual language.',
+    ],
+  },
+  {
+    date: 'Jun 2023 – Mar 2026',
+    title: 'Videographer & Content Creator',
+    company: 'Freelance · Delhi NCR',
+    points: [
+      'Delivered end-to-end video production for fashion, corporate, and product clients.',
+      'Shot and edited over 50 commercial campaigns — brand films, reels, and ad spots.',
+      'Handled colour grading and audio post-production independently.',
+      'Managed client briefs, on-set direction, and final deliverables.',
+    ],
+  },
+];
+
 const Experience = () => {
-  const jobs = [
-    {
-      title: 'Executive – Department of Digital Marketing',
-      company: 'Rama Hospital & Research Centre | Noida, UP',
-      date: 'April 2026 – Present',
-      points: [
-        'Spearhead digital marketing by conceptualizing, shooting, and editing healthcare-focused multimedia content.',
-        'Collaborate with medical professionals to produce educational videos, patient testimonials, and promotional campaigns.',
-        'Manage end-to-end video production workflows for YouTube, Instagram, and Facebook.',
-        'Optimize video and visual content, analyzing performance metrics to increase audience retention.'
-      ]
-    },
-    {
-      title: 'Video & Photo Editor',
-      company: 'SitaMarhi Tej',
-      date: 'February 2025 – November 2025',
-      points: [
-        'Directed on-location videography and studio photography for high-stakes regional news coverage.',
-        'Executed post-production using Adobe Premiere Pro — precision cutting, multi-cam, color correction, lower-thirds.',
-        'Engineered dynamic thumbnails and social media creatives, significantly increasing viewer CTR and channel growth.',
-        'Established a structured media asset management system for the editorial team.'
-      ]
-    }
-  ];
-
   return (
-    <section id="experience" className="section experience-bg">
-      <div className="section-inner">
-        <p className="section-label">Career</p>
-        <h2 className="section-title">Professional Experience</h2>
-        <p className="section-desc">Crafting compelling narratives at every role.</p>
+    <section className="section" id="experience">
+      <div className="container">
+        <div className="section-tag">
+          <span className="section-tag-text">03 / Experience</span>
+          <div className="section-tag-line" />
+        </div>
 
-        <div className="timeline">
+        <h2 className="section-title">Work<br /><span className="accent">History.</span></h2>
+
+        <div className="exp-list">
           {jobs.map((job, i) => (
-            <div key={i} className="timeline-item">
-              <div className="timeline-dot"></div>
-              <div className="timeline-date">{job.date}</div>
-              <div className="timeline-card">
+            <div key={i} className="exp-row">
+              <div className="exp-date">{job.date}</div>
+              <div className="exp-body">
                 <h3>{job.title}</h3>
-                <div className="company">{job.company}</div>
+                <p className="exp-company">{job.company}</p>
                 <ul>
-                  {job.points.map((p, j) => (
-                    <li key={j}>{p}</li>
+                  {job.points.map((pt, j) => (
+                    <li key={j}>{pt}</li>
                   ))}
                 </ul>
               </div>
