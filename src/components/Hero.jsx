@@ -1,84 +1,257 @@
-import React from 'react';
-import sanchitHero from '../assets/sanchit_hero.png';
+import React, { useRef, useEffect } from 'react';
+import sanchitBase from '../assets/sanchit_base.jpg';
+import sanchitSpider from '../assets/sanchit_spiderman_face.png';
 
 const Hero = () => {
+  const containerRef = useRef(null);
+  const overlayRef = useRef(null);
+  const cursorRef = useRef(null);
+  const rafRef = useRef(null);
+
+  // lerp values
+  const cur = useRef({ x: 0, y: 0 });
+  const target = useRef({ x: 0, y: 0 });
+  const RADIUS = 130;
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const overlay = overlayRef.current;
+    const cursor = cursorRef.current;
+    let active = false;
+
+    const lerp = (a, b, t) => a + (b - a) * t;
+
+    const tick = () => {
+      cur.current.x = lerp(cur.current.x, target.current.x, 0.1);
+      cur.current.y = lerp(cur.current.y, target.current.y, 0.1);
+
+      const x = cur.current.x;
+      const y = cur.current.y;
+
+      overlay.style.clipPath = `circle(${active ? RADIUS : 0}px at ${x}px ${y}px)`;
+      cursor.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+
+    const onMove = (e) => {
+      const rect = container.getBoundingClientRect();
+      target.current.x = e.clientX - rect.left;
+      target.current.y = e.clientY - rect.top;
+      if (!active) {
+        active = true;
+        cursor.style.opacity = '1';
+      }
+    };
+
+    const onLeave = () => {
+      active = false;
+      cursor.style.opacity = '0';
+    };
+
+    container.addEventListener('mousemove', onMove);
+    container.addEventListener('mouseleave', onLeave);
+
+    return () => {
+      container.removeEventListener('mousemove', onMove);
+      container.removeEventListener('mouseleave', onLeave);
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
   return (
-    <section className="hero-section" id="about">
-      {/* Radial glow */}
-      <div className="hero-radial" />
-      <div className="hero-scan-lines" />
+    <section
+      ref={containerRef}
+      style={{
+        position: 'relative',
+        width: '100vw',
+        height: '100vh',
+        overflow: 'hidden',
+        cursor: 'none',
+        background: '#09090b',
+      }}
+    >
+      {/* ── BASE LAYER: Normal photo ── */}
+      <img
+        src={sanchitBase}
+        alt="Sanchit Kumar"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center top',
+          filter: 'brightness(0.55) contrast(1.1) saturate(0.8)',
+          userSelect: 'none',
+          pointerEvents: 'none',
+        }}
+      />
 
-      {/* Spider web background */}
-      <svg className="web-bg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" fill="none" aria-hidden="true" style={{opacity:0.1}}>
-        {[0,45,90,135,180,225,270,315].map((a, i) => {
-          const rad = (a * Math.PI) / 180;
-          return <line key={i} x1="1200" y1="0" x2={1200 + 700*Math.cos(rad)} y2={0 + 700*Math.sin(rad)} stroke="var(--accent)" strokeWidth="0.8"/>;
-        })}
-        {[80,180,280,380].map((r, i) => (
-          <polygon key={i} stroke="var(--accent)" strokeWidth="0.8" fill="none"
-            points={[0,45,90,135,180,225,270,315].map(a => {
-              const rad = (a * Math.PI) / 180;
-              return `${1200+r*Math.cos(rad)},${0+r*Math.sin(rad)}`;
-            }).join(' ')}
-          />
-        ))}
-      </svg>
+      {/* ── Dark gradient overlay for text readability ── */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'linear-gradient(to right, rgba(9,9,11,0.7) 0%, rgba(9,9,11,0.1) 50%, transparent 100%)',
+        pointerEvents: 'none',
+        zIndex: 1,
+      }} />
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'linear-gradient(to top, rgba(9,9,11,0.8) 0%, transparent 50%)',
+        pointerEvents: 'none',
+        zIndex: 1,
+      }} />
 
-      {/* Main content */}
-      <div className="hero-main">
-        {/* LEFT: text */}
-        <div className="hero-left">
-          <div className="hero-overline">
-            <span className="hero-overline-line" />
-            Portfolio — Est. 2024
-          </div>
+      {/* ── OVERLAY LAYER: Spiderman masked photo, revealed by circle ── */}
+      <img
+        ref={overlayRef}
+        src={sanchitSpider}
+        alt="Spiderman"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center top',
+          filter: 'brightness(0.75) contrast(1.1)',
+          clipPath: 'circle(0px at 50% 50%)',
+          transition: 'none',
+          userSelect: 'none',
+          pointerEvents: 'none',
+          zIndex: 2,
+        }}
+      />
 
-          <h1 className="hero-headline">
-            <span className="hero-headline-line"><span>CRAFTING</span></span>
-            <span className="hero-headline-line"><span>CINEMATIC</span></span>
-            <span className="hero-headline-line"><span>STORIES,</span></span>
-            <span className="hero-headline-line"><span>FRAME <span className="hero-headline-accent">BY</span></span></span>
-            <span className="hero-headline-line"><span><span className="hero-headline-accent">FRAME.</span></span></span>
-          </h1>
-
-          <p className="hero-desc">
-            Videographer &amp; Digital Content Specialist based in Delhi —
-            transforming raw footage into broadcast-ready stories that
-            elevate brands and drive real audience engagement.
-          </p>
-
-          <div className="hero-ctas">
-            <a href="#work" className="hero-cta-primary">
-              <span className="cta-line" />
-              View Work
-            </a>
-            <a href="#contact" className="hero-cta-secondary">
-              <span className="cta-line" />
-              Get in Touch
-            </a>
-          </div>
-        </div>
-
-        {/* RIGHT: photo */}
-        <div className="hero-right">
-          <div className="hero-img-frame">
-            <img
-              src={sanchitHero}
-              alt="Sanchit Kumar — Videographer"
-              className="hero-photo"
-            />
-          </div>
-          <span className="hero-img-caption">Sanchit Kumar · Videographer · Delhi</span>
-        </div>
+      {/* ── Custom cursor: spider icon ── */}
+      <div
+        ref={cursorRef}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          zIndex: 10,
+          opacity: 0,
+          pointerEvents: 'none',
+          transition: 'opacity 0.3s',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '4px',
+        }}
+      >
+        {/* Circle ring */}
+        <div style={{
+          position: 'absolute',
+          width: `${RADIUS * 2}px`,
+          height: `${RADIUS * 2}px`,
+          border: '1.5px solid rgba(232,0,28,0.5)',
+          borderRadius: '50%',
+          transform: 'translate(-50%, -50%)',
+          pointerEvents: 'none',
+        }} />
+        {/* Spider icon */}
+        <span style={{
+          fontSize: '1rem',
+          filter: 'drop-shadow(0 0 6px #e8001c)',
+          position: 'absolute',
+          transform: 'translate(-50%, -50%)',
+        }}>🕷</span>
       </div>
 
-      {/* Bottom bar */}
-      <div className="hero-bottom">
-        <span>Based in Karkardooma, Delhi</span>
-        <div className="hero-scroll-hint">
-          <div className="scroll-dot" />
-          <span>Scroll to explore</span>
-        </div>
+      {/* ── TEXT OVERLAY ── */}
+      <div style={{
+        position: 'absolute',
+        bottom: '8%',
+        left: '4%',
+        zIndex: 5,
+        pointerEvents: 'none',
+        userSelect: 'none',
+      }}>
+        {/* Small overline */}
+        <p style={{
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontSize: '0.62rem',
+          letterSpacing: '0.3em',
+          textTransform: 'uppercase',
+          color: 'rgba(255,255,255,0.5)',
+          marginBottom: '0.3rem',
+        }}>Your Friendly Neighborhood</p>
+        <p style={{
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontSize: '0.62rem',
+          letterSpacing: '0.3em',
+          textTransform: 'uppercase',
+          color: '#e8001c',
+          marginBottom: '1rem',
+        }}>Videographer &amp; Content Creator</p>
+
+        {/* Big name */}
+        <h1 style={{
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontWeight: 700,
+          lineHeight: 0.9,
+          letterSpacing: '-3px',
+          textTransform: 'uppercase',
+          margin: 0,
+        }}>
+          <span style={{
+            display: 'block',
+            fontSize: 'clamp(3.5rem, 9vw, 9rem)',
+            color: '#f0f0f0',
+          }}>SANCHIT</span>
+          <span style={{
+            display: 'block',
+            fontSize: 'clamp(3.5rem, 9vw, 9rem)',
+            color: '#e8001c',
+          }}>KUMAR.</span>
+        </h1>
+      </div>
+
+      {/* ── Download CV link ── */}
+      <a
+        href="#contact"
+        style={{
+          position: 'absolute',
+          bottom: '3%',
+          left: '4%',
+          zIndex: 5,
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontSize: '0.65rem',
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase',
+          color: 'rgba(255,255,255,0.4)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          textDecoration: 'none',
+          cursor: 'default',
+          transition: 'color 0.3s',
+        }}
+        onMouseEnter={e => e.currentTarget.style.color = '#e8001c'}
+        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.4)'}
+      >
+        ↓ Explore Work
+      </a>
+
+      {/* ── Scroll hint bottom right ── */}
+      <div style={{
+        position: 'absolute',
+        bottom: '3%',
+        right: '3%',
+        zIndex: 5,
+        fontFamily: "'Space Grotesk', sans-serif",
+        fontSize: '0.6rem',
+        letterSpacing: '0.2em',
+        textTransform: 'uppercase',
+        color: 'rgba(255,255,255,0.3)',
+        pointerEvents: 'none',
+      }}>
+        Scroll ↓
       </div>
     </section>
   );

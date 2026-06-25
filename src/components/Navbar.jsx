@@ -12,26 +12,84 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className={`navbar${visible ? ' visible' : ''}`}>
-      <div className={`nav-inner${scrolled ? ' scrolled' : ''}`}>
-        <a href="#" className="nav-logo">
-          <svg className="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="2"/>
-            <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83"/>
-          </svg>
-          Sanchit<span style={{color:'var(--accent)'}}>.</span>
+    <nav style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 500,
+      display: 'flex',
+      justifyContent: 'center',
+      padding: '1.2rem 1.5rem 0',
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'translateY(0)' : 'translateY(-60px)',
+      transition: 'opacity 0.6s ease, transform 0.6s ease',
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '1200px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0.8rem 1.5rem',
+        borderRadius: '40px',
+        background: scrolled ? 'rgba(9,9,11,0.85)' : 'transparent',
+        border: scrolled ? '1px solid rgba(255,255,255,0.08)' : '1px solid transparent',
+        backdropFilter: scrolled ? 'blur(20px)' : 'none',
+        transition: 'all 0.4s ease',
+      }}>
+        {/* Logo */}
+        <a href="#" style={{
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontWeight: 700,
+          fontSize: '1.1rem',
+          color: '#fff',
+          textDecoration: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.4rem',
+        }}>
+          <span style={{color:'#e8001c'}}>✦</span> Sanchit<span style={{color:'#e8001c'}}>.</span>
         </a>
 
-        <div className="nav-links">
+        {/* Nav links */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
           {['Work','About','Experience','Contact'].map(link => (
-            <a key={link} href={`#${link.toLowerCase()}`} className="nav-link">
-              <span className="nav-link-top">{link}</span>
-              <span className="nav-link-bot">{link}</span>
-            </a>
+            <a key={link} href={`#${link.toLowerCase()}`} style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: '0.72rem',
+              fontWeight: 600,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.55)',
+              padding: '0.4rem 0.9rem',
+              textDecoration: 'none',
+              transition: 'color 0.3s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = '#e8001c'}
+            onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.55)'}
+            >{link}</a>
           ))}
         </div>
 
-        <a href="mailto:sanchit@example.com" className="nav-cta">Hire Me</a>
+        {/* CTA */}
+        <a href="mailto:sanchit@example.com" style={{
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontSize: '0.7rem',
+          fontWeight: 600,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: '#e8001c',
+          border: '1px solid rgba(255,255,255,0.15)',
+          padding: '0.5rem 1.1rem',
+          borderRadius: '40px',
+          textDecoration: 'none',
+          transition: 'all 0.3s ease',
+          background: 'transparent',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(232,0,28,0.12)'; e.currentTarget.style.borderColor = '#e8001c'; }}
+        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; }}
+        >Hire Me</a>
       </div>
     </nav>
   );
